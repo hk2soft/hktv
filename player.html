@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>مشغّلي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+<style>
+:root{
+  --bg:#0b0d12; --bg2:#12151d; --card:#181c26; --card2:#1f2431;
+  --line:#2a3040; --text:#eef1f7; --muted:#8b93a7;
+  --accent:#e50914; --accent2:#ff3d47; --gold:#ffc83d; --ok:#2ecc71; --warn:#f5a623;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'Tajawal',system-ui,sans-serif;overflow:hidden}
+button,input{font-family:inherit;color:inherit}
+button{cursor:pointer;border:0;background:none}
+.hidden{display:none!important}
+
+/* ---------- الدخول ---------- */
+#login{position:fixed;inset:0;display:grid;place-items:center;padding:16px;overflow:auto;
+  background:radial-gradient(1200px 600px at 80% -10%,#3a0a10 0%,transparent 60%),
+             radial-gradient(900px 500px at 0% 110%,#0d1f3a 0%,transparent 60%),var(--bg)}
+.login-box{width:100%;max-width:410px;background:rgba(24,28,38,.85);backdrop-filter:blur(14px);
+  border:1px solid var(--line);border-radius:22px;padding:34px 26px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.5)}
+.brand{display:flex;align-items:center;justify-content:center;gap:10px;font-size:30px;font-weight:800}
+.brand-icon{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,var(--accent),#8b0000);
+  display:grid;place-items:center;box-shadow:0 8px 24px rgba(229,9,20,.4);flex-shrink:0}
+.login-box p{color:var(--muted);margin:10px 0 22px}
+.announce{background:rgba(255,200,61,.08);border:1px solid rgba(255,200,61,.3);color:var(--gold);
+  border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:18px;white-space:pre-line}
+.code-input{width:100%;padding:16px;font-size:24px;letter-spacing:5px;text-align:center;direction:ltr;text-transform:uppercase;
+  background:var(--bg2);border:2px solid var(--line);border-radius:var(--radius);outline:none;transition:.2s;font-weight:700}
+.code-input::placeholder{color:#3c4458}
+.code-input:focus{border-color:var(--accent)}
+.code-input.shake{animation:shake .4s;border-color:var(--accent)}
+@keyframes shake{25%{transform:translateX(-8px)}50%{transform:translateX(8px)}75%{transform:translateX(-4px)}}
+.btn-primary{width:100%;margin-top:16px;padding:15px;font-size:17px;font-weight:700;border-radius:var(--radius);
+  background:linear-gradient(135deg,var(--accent),var(--accent2));transition:.2s}
+.btn-primary:hover{filter:brightness(1.1)}
+.btn-primary:disabled{opacity:.55;cursor:wait}
+.login-msg{min-height:22px;margin-top:14px;font-size:14px;color:var(--accent2)}
+.contact{display:inline-flex;align-items:center;gap:8px;margin-top:8px;color:#25d366;text-decoration:none;font-size:14px;font-weight:600}
+.contact:hover{text-decoration:underline}
+
+.lbl{display:block;text-align:right;font-size:13px;color:var(--muted);margin:12px 0 6px}
+.fld{width:100%;padding:13px 14px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;outline:none;direction:ltr;text-align:left;font-size:15px;color:var(--text);font-family:inherit}
+.fld:focus{border-color:var(--accent)}
+.remember{display:flex;align-items:center;gap:8px;margin-top:14px;font-size:14px;color:var(--muted);cursor:pointer}
+.remember input{accent-color:var(--accent);width:16px;height:16px}
+.privacy{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.6}
+.login-msg{line-height:1.6}
+/* ---------- التطبيق ---------- */
+#app{height:100%;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--bg2);border-bottom:1px solid var(--line)}
+header .brand{font-size:22px;justify-content:flex-start}
+header .brand-icon{width:36px;height:36px;border-radius:10px}
+.search{flex:1;max-width:460px;margin-inline-start:auto;position:relative}
+.search input{width:100%;padding:11px 42px 11px 14px;background:var(--card);border:1px solid var(--line);
+  border-radius:999px;outline:none;font-size:15px}
+.search input:focus{border-color:var(--accent)}
+.search svg{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.exp{font-size:13px;padding:7px 12px;border-radius:999px;background:rgba(46,204,113,.12);color:var(--ok);white-space:nowrap;font-weight:600}
+.exp.warn{background:rgba(245,166,35,.14);color:var(--warn)}
+.icon-btn{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--card);
+  border:1px solid var(--line);transition:.2s;flex-shrink:0}
+.icon-btn:hover{background:var(--card2);border-color:var(--accent)}
+
+main{flex:1;display:grid;grid-template-columns:1fr 400px;min-height:0}
+.player-side{padding:20px;overflow:auto;display:flex;flex-direction:column;gap:16px}
+.player-wrap{position:relative;background:#000;border-radius:18px;overflow:hidden;aspect-ratio:16/9;
+  border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.45)}
+video{width:100%;height:100%;display:block;background:#000}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;
+  background:rgba(0,0,0,.65);pointer-events:none}
+.overlay .big{font-size:20px;font-weight:700;margin-bottom:6px}
+.overlay small{color:var(--muted)}
+.spinner{width:52px;height:52px;border:4px solid rgba(255,255,255,.15);border-top-color:var(--accent);
+  border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
+@keyframes spin{to{transform:rotate(360deg)}}
+.live-badge{position:absolute;top:14px;right:14px;background:var(--accent);padding:4px 10px;border-radius:6px;
+  font-size:12px;font-weight:800;display:flex;align-items:center;gap:6px}
+.live-badge::before{content:"";width:7px;height:7px;border-radius:50%;background:#fff;animation:pulse 1.2s infinite}
+@keyframes pulse{50%{opacity:.2}}
+
+.now{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+.now .logo{width:58px;height:58px}
+.now-info{flex:1;min-width:0}
+.now-info h2{font-size:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.now-info span{color:var(--muted);font-size:14px}
+.now-actions{display:flex;gap:8px}
+
+.list-side{background:var(--bg2);border-inline-start:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+.list-head{padding:16px 16px 10px;display:flex;justify-content:space-between;align-items:center}
+.list-head h3{font-size:17px}
+.count{color:var(--muted);font-size:13px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:0 16px 12px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{white-space:nowrap;padding:7px 14px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13px;transition:.2s}
+.chip:hover{border-color:var(--muted)}
+.chip.active{background:var(--accent);border-color:var(--accent);font-weight:700}
+.channels{flex:1;overflow-y:auto;padding:0 10px 16px}
+.ch{width:100%;display:flex;align-items:center;gap:12px;padding:9px 10px;border-radius:12px;text-align:right;
+  transition:.15s;border:1px solid transparent;cursor:pointer}
+.ch:hover{background:var(--card)}
+.ch.active{background:linear-gradient(90deg,transparent,rgba(229,9,20,.18));border-color:rgba(229,9,20,.5)}
+.ch-info{flex:1;min-width:0}
+.ch-name{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch-group{font-size:12px;color:var(--muted)}
+.logo{width:44px;height:44px;border-radius:10px;background:var(--card2);display:grid;place-items:center;
+  overflow:hidden;flex-shrink:0;font-weight:800;color:var(--muted)}
+.logo img{width:100%;height:100%;object-fit:contain;padding:4px}
+.star{padding:6px;color:var(--muted);border-radius:8px;flex-shrink:0}
+.star:hover{background:var(--card2)}
+.star.on{color:var(--gold)}
+.empty{text-align:center;color:var(--muted);padding:40px 20px}
+
+@media (max-width:900px){
+  body{overflow:auto}
+  main{display:flex;flex-direction:column}
+  .player-side{padding:12px;overflow:visible;position:sticky;top:0;z-index:5;background:var(--bg)}
+  .player-wrap{border-radius:12px}
+  .list-side{border:0}
+  .channels{overflow:visible}
+  header{padding:10px 12px;gap:8px;flex-wrap:wrap}
+  header .brand span{display:none}
+  .search{order:5;flex-basis:100%;max-width:none}
+  .exp{margin-inline-start:auto}
+  .now{padding:10px}
+  .now .logo{width:44px;height:44px}
+  .now-info h2{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<section id="login">
+  <form class="login-box" id="loginForm" autocomplete="on">
+    <div class="brand"><div class="brand-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff"><path d="M21 6h-7.6l3.3-3.3-.7-.7L12 6 8 2l-.7.7L10.6 6H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg>
+    </div><span>مشغّلي</span></div>
+    <p>ادخل بيانات اشتراكك (Xtream Codes)</p>
+    <label class="lbl">رابط الخادم (Host)</label>
+    <input class="fld" id="host" type="text" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="http://example.com:80" required>
+    <label class="lbl">اسم المستخدم</label>
+    <input class="fld" id="user" type="text" autocomplete="username" required>
+    <label class="lbl">كلمة المرور</label>
+    <input class="fld" id="pass" type="password" autocomplete="current-password" required>
+    <label class="remember"><input type="checkbox" id="remember" checked> تذكّر بياناتي على هذا الجهاز</label>
+    <button class="btn-primary" id="loginBtn" type="submit">دخول</button>
+    <div class="login-msg" id="loginMsg"></div>
+    <div class="privacy">🔒 بياناتك تُحفظ في هذا الجهاز فقط وتُرسل لخادم اشتراكك وحده.</div>
+  </form>
+</section>
+
+<div id="app" class="hidden">
+  <header>
+    <div class="brand"><div class="brand-icon">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M21 6h-7.6l3.3-3.3-.7-.7L12 6 8 2l-.7.7L10.6 6H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg>
+    </div><span>مشغّلي</span></div>
+    <div class="search">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="search" type="search" placeholder="ابحث عن قناة...">
+    </div>
+    <span class="exp" id="expBadge"></span>
+    <button class="icon-btn" id="logoutBtn" title="خروج">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="player-side">
+      <div class="player-wrap">
+        <video id="video" controls playsinline autoplay></video>
+        <div class="live-badge hidden" id="liveBadge">مباشر</div>
+        <div class="overlay" id="overlay">
+          <div><div class="big">اختر قناة للمشاهدة</div><small>من قائمة القنوات</small></div>
+        </div>
+      </div>
+      <div class="now">
+        <div class="logo" id="nowLogo">TV</div>
+        <div class="now-info">
+          <h2 id="nowName">لا توجد قناة قيد التشغيل</h2>
+          <span id="nowGroup">—</span>
+        </div>
+        <div class="now-actions">
+          <button class="icon-btn" id="prevBtn" title="القناة السابقة">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" transform="matrix(-1 0 0 1 24 0)"/></svg>
+          </button>
+          <button class="icon-btn" id="nextBtn" title="القناة التالية">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <aside class="list-side">
+      <div class="list-head"><h3>القنوات</h3><span class="count" id="count"></span></div>
+      <div class="chips" id="chips"></div>
+      <div class="channels" id="channels"></div>
+    </aside>
+  </main>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d=null){ try{ const v = localStorage.getItem(k); return v===null ? d : JSON.parse(v); }catch{ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch{} },
+  del(k){ try{ localStorage.removeItem(k); }catch{} }
+};
+const escapeHTML = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+/* =========== الحساب =========== */
+let ACC = null;   // { host, user, pass }
+const msg = t => { $('loginMsg').innerHTML = t || ''; };
+function setBusy(b){ $('loginBtn').disabled = b; $('loginBtn').textContent = b ? 'جارِ الاتصال...' : 'دخول'; }
+function normHost(h){
+  h = String(h || '').trim().replace(/\/+$/, '');
+  if (h && !/^https?:\/\//i.test(h)) h = 'http://' + h;
+  return h;
+}
+const api = (action = '') =>
+  `${ACC.host}/player_api.php?username=${encodeURIComponent(ACC.user)}&password=${encodeURIComponent(ACC.pass)}${action ? '&action=' + action : ''}`;
+
+async function getJSON(url){
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 20000);
+  try{
+    const r = await fetch(url, { signal: ctl.signal });
+    if (!r.ok) throw Object.assign(new Error('HTTP ' + r.status), { kind: 'http' });
+    return await r.json();
+  }catch(e){
+    if (e.kind) throw e;
+    if (e.name === 'AbortError') throw Object.assign(new Error('timeout'), { kind: 'timeout' });
+    throw Object.assign(new Error('blocked'), { kind: 'blocked' });
+  }finally{ clearTimeout(t); }
+}
+
+function explain(e){
+  if (e.kind === 'blocked'){
+    if (location.protocol === 'https:') return 'هذه الصفحة مفتوحة من موقع آمن (https) والخادم يعمل بـ http، فالمتصفح يمنع الاتصال.<br>احفظ الملف على جهازك وافتحه بالنقر المزدوج.';
+    return 'تعذّر الاتصال بالخادم. إما أن الرابط خطأ، أو أن خادم الاشتراك لا يسمح بالتشغيل من المتصفح. في الحالة الثانية لا يوجد حل من جهة الصفحة، واستخدم تطبيقًا مثل VLC.';
+  }
+  if (e.kind === 'timeout') return 'الخادم لم يستجب. تحقق من الرابط والإنترنت وحاول مجددًا.';
+  return 'خطأ من الخادم (' + escapeHTML(e.message) + '). تحقق من الرابط.';
+}
+
+async function login(acc, silent = false){
+  ACC = acc; setBusy(true); msg('');
+  try{
+    const info = await getJSON(api());
+    const u = info && info.user_info;
+    if (!u || Number(u.auth) !== 1){ msg('اسم المستخدم أو كلمة المرور غير صحيحة.'); return; }
+    if (u.status && u.status !== 'Active'){ msg('الاشتراك غير فعّال (' + escapeHTML(u.status) + ').'); return; }
+    if ($('remember').checked) store.set('acc', acc); else store.del('acc');
+    showAccInfo(u);
+    $('channels').innerHTML = '<div class="empty"><div class="spinner"></div><br>جارِ تحميل القنوات...</div>';
+    showApp();
+    await loadChannels();
+  }catch(e){
+    console.error(e);
+    if (!silent || e.kind !== 'blocked') msg(explain(e));
+    if (!$('app').classList.contains('hidden')) showLogin(explain(e));
+  }finally{ setBusy(false); }
+}
+
+$('loginForm').addEventListener('submit', e => {
+  e.preventDefault();
+  login({ host: normHost($('host').value), user: $('user').value.trim(), pass: $('pass').value });
+});
+
+function showApp(){ $('login').classList.add('hidden'); $('app').classList.remove('hidden'); }
+function showLogin(m){
+  stopPlayer();
+  $('app').classList.add('hidden'); $('login').classList.remove('hidden');
+  msg(m || '');
+}
+$('logoutBtn').onclick = () => {
+  if (confirm('تسجيل الخروج؟ سيتم حذف بيانات الحساب من هذا الجهاز.')){ store.del('acc'); showLogin(); $('pass').value = ''; }
+};
+
+function showAccInfo(u){
+  const b = $('expBadge');
+  const exp = Number(u.exp_date) * 1000;
+  const cons = u.max_connections ? ` · ${u.active_cons || 0}/${u.max_connections} اتصال` : '';
+  if (!exp){ b.textContent = 'اشتراك غير محدود' + cons; b.className = 'exp'; return; }
+  const days = Math.ceil((exp - Date.now()) / 864e5);
+  b.textContent = (days <= 1 ? 'ينتهي اليوم' : `متبقٍ ${days} يوم`) + cons;
+  b.className = 'exp' + (days <= 5 ? ' warn' : '');
+}
+
+/* =========== القنوات =========== */
+let channels = [], groups = [], view = [];
+let currentGroup = 'all', query = '', current = null;
+let favorites = new Set(store.get('favorites', []));
+
+async function loadChannels(){
+  const [cats, streams] = await Promise.all([getJSON(api('get_live_categories')), getJSON(api('get_live_streams'))]);
+  const catName = {};
+  (Array.isArray(cats) ? cats : []).forEach(c => catName[c.category_id] = c.category_name);
+  channels = (Array.isArray(streams) ? streams : []).map((s, i) => ({
+    id: i, sid: s.stream_id, name: s.name || 'قناة', logo: s.stream_icon || '',
+    group: catName[s.category_id] || 'أخرى', key: String(s.stream_id)
+  }));
+  const order = (Array.isArray(cats) ? cats : []).map(c => c.category_name);
+  const map = {};
+  channels.forEach(c => map[c.group] = (map[c.group] || 0) + 1);
+  groups = Object.keys(map).sort((a, b) => (order.indexOf(a) + 1 || 1e9) - (order.indexOf(b) + 1 || 1e9)).map(g => ({ name: g, n: map[g] }));
+  currentGroup = 'all';
+  renderChips(); renderList();
+  const lastCh = channels.find(c => c.key === store.get('lastChannel'));
+  if (lastCh) showNow(lastCh);
+}
+const streamURL = (c, ext) => `${ACC.host}/live/${encodeURIComponent(ACC.user)}/${encodeURIComponent(ACC.pass)}/${c.sid}.${ext}`;
+
+function renderChips(){
+  const all = [{ key:'all', label:`الكل (${channels.length})` }, { key:'fav', label:`★ المفضلة (${channels.filter(c=>favorites.has(c.key)).length})` }]
+    .concat(groups.map(g => ({ key:g.name, label:`${g.name} (${g.n})` })));
+  $('chips').innerHTML = '';
+  all.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (c.key === currentGroup ? ' active' : '');
+    b.textContent = c.label;
+    b.onclick = () => { currentGroup = c.key; renderChips(); renderList(); };
+    $('chips').appendChild(b);
+  });
+}
+
+function logoHTML(c){
+  const initial = escapeHTML((c.name || '?').trim().charAt(0).toUpperCase()).replace(/'/g, '');
+  if (!c.logo) return initial;
+  return `<img loading="lazy" src="${escapeHTML(c.logo)}" alt="" onerror="this.replaceWith(document.createTextNode('${initial}'))">`;
+}
+
+const PAGE = 300;
+let shown = PAGE;
+function renderList(reset = true){
+  if (reset) shown = PAGE;
+  const q = query.toLowerCase();
+  view = channels.filter(c =>
+    (currentGroup === 'all' || (currentGroup === 'fav' ? favorites.has(c.key) : c.group === currentGroup)) &&
+    (!q || c.name.toLowerCase().includes(q) || c.group.toLowerCase().includes(q)));
+  $('count').textContent = `${view.length} قناة`;
+  const box = $('channels');
+  if (!channels.length){ box.innerHTML = '<div class="empty">لا توجد قنوات في هذا الاشتراك.</div>'; return; }
+  if (!view.length){
+    box.innerHTML = `<div class="empty">${currentGroup==='fav' ? 'لا توجد قنوات في المفضلة بعد.<br><small>اضغط ★ بجانب أي قناة لإضافتها.</small>' : 'لا توجد نتائج'}</div>`;
+    return;
+  }
+  box.innerHTML = view.slice(0, shown).map(c => `
+    <div class="ch ${current && current.key===c.key ? 'active':''}" data-id="${c.id}" role="button" tabindex="0">
+      <div class="logo">${logoHTML(c)}</div>
+      <div class="ch-info"><div class="ch-name">${escapeHTML(c.name)}</div><div class="ch-group">${escapeHTML(c.group)}</div></div>
+      <button class="star ${favorites.has(c.key)?'on':''}" data-star="${c.id}" title="المفضلة">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="m12 17.3 6.2 3.7-1.6-7 5.4-4.7-7.1-.6L12 2 9.1 8.7 2 9.3l5.4 4.7-1.6 7z"/></svg>
+      </button>
+    </div>`).join('') +
+    (view.length > shown ? `<div class="empty"><button class="chip" id="moreBtn">عرض المزيد (${view.length - shown} قناة)</button></div>` : '');
+  const more = $('moreBtn'); if (more) more.onclick = () => { shown += PAGE; renderList(false); };
+}
+
+$('channels').addEventListener('click', e => {
+  const star = e.target.closest('[data-star]');
+  if (star){
+    e.stopPropagation();
+    const c = channels[+star.dataset.star];
+    favorites.has(c.key) ? favorites.delete(c.key) : favorites.add(c.key);
+    store.set('favorites', [...favorites]);
+    renderChips(); renderList(false); return;
+  }
+  const row = e.target.closest('.ch');
+  if (row) play(channels[+row.dataset.id]);
+});
+$('channels').addEventListener('keydown', e => {
+  if (e.key === 'Enter'){ const row = e.target.closest('.ch'); if (row) play(channels[+row.dataset.id]); }
+});
+let searchTimer;
+$('search').addEventListener('input', e => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => { query = e.target.value.trim(); renderList(); }, 200);
+});
+
+/* =========== المشغّل =========== */
+const video = $('video');
+let hls = null, attempt = 0, playToken = 0;
+
+function setOverlay(html){
+  if (!html){ $('overlay').classList.add('hidden'); return; }
+  $('overlay').innerHTML = html; $('overlay').classList.remove('hidden');
+}
+function stopPlayer(){
+  if (hls){ hls.destroy(); hls = null; }
+  video.pause(); video.removeAttribute('src'); video.load();
+  $('liveBadge').classList.add('hidden');
+}
+function showNow(c){
+  current = c;
+  $('nowName').textContent = c.name;
+  $('nowGroup').textContent = c.group;
+  $('nowLogo').innerHTML = logoHTML(c);
+  document.querySelectorAll('.ch.active').forEach(el => el.classList.remove('active'));
+  const row = document.querySelector(`.ch[data-id="${c.id}"]`);
+  if (row){ row.classList.add('active'); row.scrollIntoView({ block:'nearest', behavior:'smooth' }); }
+}
+
+/* محاولات التشغيل بالترتيب: hls.js ← التشغيل المباشر في المتصفح */
+function play(c){
+  if (!c) return;
+  showNow(c);
+  store.set('lastChannel', c.key);
+  attempt = 0;
+  tryPlay(c, ++playToken);
+}
+let watchdog = null;
+function tryPlay(c, token){
+  if (token !== playToken) return;
+  stopPlayer();
+  clearTimeout(watchdog);
+  watchdog = setTimeout(() => { if (token === playToken && video.paused) showError(); }, 25000);
+  setOverlay('<div><div class="spinner"></div><br><small>جارِ الاتصال بالبث...</small></div>');
+  const url = streamURL(c, 'm3u8');
+  if (attempt === 0 && window.Hls && Hls.isSupported()){
+    let retried = false, recovered = 0;
+    hls = new Hls({ enableWorker:true, lowLatencyMode:true, backBufferLength:30, manifestLoadingMaxRetry:2 });
+    hls.loadSource(url);
+    hls.attachMedia(video);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(()=>{}));
+    hls.on(Hls.Events.ERROR, (_, d) => {
+      if (!d.fatal) return;
+      if (d.type === Hls.ErrorTypes.MEDIA_ERROR && recovered < 2){ recovered++; hls.recoverMediaError(); return; }
+      if (d.type === Hls.ErrorTypes.NETWORK_ERROR && !retried && !/manifest/i.test(d.details)){ retried = true; hls.startLoad(); return; }
+      attempt = 1; tryPlay(c, token);
+    });
+  } else if (attempt <= 1){
+    attempt = 2;
+    video.src = url;
+    video.play().catch(()=>{});
+  } else showError();
+}
+function showError(){
+  clearTimeout(watchdog);
+  stopPlayer();
+  setOverlay('<div><div class="big">تعذّر تشغيل القناة</div><small>قد تكون القناة متوقفة، أو تجاوزت عدد الاتصالات المسموح في اشتراكك. جرّب قناة أخرى.</small></div>');
+}
+video.addEventListener('playing', () => { clearTimeout(watchdog); setOverlay(null); $('liveBadge').classList.remove('hidden'); });
+video.addEventListener('waiting', () => setOverlay('<div><div class="spinner"></div></div>'));
+video.addEventListener('error', () => {
+  if (hls || !video.getAttribute('src') || !current) return;
+  tryPlay(current, playToken);
+});
+
+function step(dir){
+  if (!view.length) return;
+  let i = current ? view.findIndex(c => c.key === current.key) : -1;
+  i = (i + dir + view.length) % view.length;
+  play(view[i]);
+}
+$('nextBtn').onclick = () => step(1);
+$('prevBtn').onclick = () => step(-1);
+document.addEventListener('keydown', e => {
+  if ($('app').classList.contains('hidden') || e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowDown' || e.key === 'PageDown'){ e.preventDefault(); step(1); }
+  if (e.key === 'ArrowUp' || e.key === 'PageUp'){ e.preventDefault(); step(-1); }
+  if (e.key === 'f' || e.key === 'ب'){ video.requestFullscreen && video.requestFullscreen(); }
+  if (e.key === '/'){ e.preventDefault(); $('search').focus(); }
+});
+
+/* =========== البدء =========== */
+const saved = store.get('acc');
+if (saved){
+  $('host').value = saved.host; $('user').value = saved.user; $('pass').value = saved.pass;
+  login(saved, true);
+}
+
+</script>
+</body>
+</html>
