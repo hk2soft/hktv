@@ -1,0 +1,1068 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>لوحة التحكم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1"></script>
+<style>
+:root{
+  --bg:#0b0d12; --bg2:#12151d; --card:#181c26; --card2:#1f2431;
+  --line:#2a3040; --text:#eef1f7; --muted:#8b93a7;
+  --accent:#e50914; --accent2:#ff3d47; --ok:#2ecc71; --warn:#f5a623; --bad:#ff4d5a;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Tajawal',system-ui,sans-serif;min-height:100vh}
+button,input,select,textarea{font-family:inherit;color:inherit;font-size:inherit}
+button{cursor:pointer;border:0;background:none}
+a{color:inherit;text-decoration:none}
+.hidden{display:none!important}
+
+.center{min-height:100vh;display:grid;place-items:center;padding:16px;
+  background:radial-gradient(1000px 500px at 80% -10%,#3a0a10 0%,transparent 60%),radial-gradient(800px 400px at 0% 110%,#0d1f3a 0%,transparent 60%),var(--bg)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius)}
+.login{width:100%;max-width:400px;padding:32px 26px}
+.login h1{font-size:23px;margin:14px 0 4px;text-align:center}
+.login>p{color:var(--muted);text-align:center;margin-bottom:12px}
+.brand-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#8b0000);display:grid;place-items:center;flex-shrink:0}
+.login .brand-icon{margin:0 auto}
+label.f{display:block;font-size:13px;color:var(--muted);margin:14px 0 6px}
+.inp{width:100%;padding:11px 12px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;outline:none}
+.inp:focus{border-color:var(--accent)}
+textarea.inp{resize:vertical;line-height:1.6}
+.ltr{direction:ltr;text-align:left}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:10px;background:var(--card2);border:1px solid var(--line);font-weight:600;white-space:nowrap;transition:.15s}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.12)}
+.btn.green{background:#1fa855;border-color:#1fa855}
+.btn.danger{color:var(--bad)}
+.btn.sm{padding:7px 12px;font-size:13px}
+.btn.block{width:100%;margin-top:20px;padding:13px}
+.btn:disabled{opacity:.5;cursor:wait}
+.ibtn{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;color:var(--muted);transition:.15s;flex-shrink:0}
+.ibtn:hover{background:var(--card2);color:var(--text)}
+.ibtn.danger:hover{color:var(--bad)}
+.msg{min-height:20px;margin-top:12px;font-size:14px;color:var(--bad);text-align:center}
+
+/* ---------- الهيكل ---------- */
+#appView{display:grid;grid-template-columns:236px 1fr;min-height:100vh}
+.pubbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 16px;border-radius:var(--radius);margin-bottom:18px;border:1px solid var(--line);background:var(--card)}
+.pubbar.dirty{border-color:rgba(245,166,35,.5);background:rgba(245,166,35,.08)}
+.pubbar.pending{border-color:rgba(80,140,255,.5);background:rgba(80,140,255,.08)}
+.pubbar .t{margin-inline-end:auto;font-weight:600}
+.pubbar small{display:block;color:var(--muted);font-weight:400}
+ol.howto{line-height:2.1;padding-inline-start:22px;margin-top:12px}
+ol.howto b{color:var(--text)}
+.side{background:var(--bg2);border-inline-end:1px solid var(--line);padding:18px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+.side .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;padding:0 6px 18px}
+.side .brand .brand-icon{width:36px;height:36px;border-radius:10px}
+.nav{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:10px;color:var(--muted);font-weight:600;width:100%;text-align:right;white-space:nowrap}
+.nav:hover{background:var(--card);color:var(--text)}
+.nav.active{background:rgba(229,9,20,.14);color:var(--text)}
+.nav .cnt{margin-inline-start:auto;font-size:12px;background:var(--card2);padding:1px 8px;border-radius:99px}
+.side-foot{margin-top:auto;border-top:1px solid var(--line);padding-top:12px;display:flex;flex-direction:column;gap:4px}
+.who{font-size:12px;color:var(--muted);direction:ltr;text-align:right;overflow:hidden;text-overflow:ellipsis;padding:0 12px 6px}
+.content{padding:24px;min-width:0}
+.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+.toolbar h2{font-size:22px;margin-inline-end:auto}
+.toolbar .inp{width:auto;min-width:210px}
+
+/* ---------- الإحصائيات ---------- */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(165px,1fr));gap:12px;margin-bottom:20px}
+.stat{padding:16px}
+.stat .n{font-size:28px;font-weight:800;line-height:1.2}
+.stat .l{color:var(--muted);font-size:13px}
+.stat.ok .n{color:var(--ok)} .stat.warn .n{color:var(--warn)} .stat.bad .n{color:var(--bad)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.panel{padding:18px}
+.panel h3{font-size:16px;margin-bottom:10px}
+.mini{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.mini:last-child{border:0}
+.mini small{color:var(--muted)}
+.empty{color:var(--muted);text-align:center;padding:28px 10px;line-height:1.8}
+.steps{line-height:2;color:var(--muted);padding-inline-start:20px}
+.steps b{color:var(--text)}
+
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap}
+.badge.ok{background:rgba(46,204,113,.15);color:var(--ok)}
+.badge.warn{background:rgba(245,166,35,.15);color:var(--warn)}
+.badge.bad{background:rgba(255,77,90,.15);color:var(--bad)}
+.badge.off{background:var(--card2);color:var(--muted)}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;background:var(--card2);margin:2px}
+
+/* ---------- جدول الأكواد ---------- */
+.table{overflow:hidden}
+.crow{display:grid;grid-template-columns:1.4fr 1.1fr 1fr .6fr .9fr .75fr auto;gap:12px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line)}
+.crow:last-child{border:0}
+.crow.head{color:var(--muted);font-size:12px;font-weight:700;background:var(--bg2)}
+.crow small{display:block;color:var(--muted);font-size:12px}
+.code{font-family:ui-monospace,Consolas,monospace;font-weight:700;letter-spacing:1px;direction:ltr;display:inline-block}
+.acts{display:flex;gap:1px;justify-content:flex-end}
+
+/* ---------- الباقات ---------- */
+.pk-layout{display:grid;grid-template-columns:250px 1fr;gap:16px;align-items:start}
+.pk-list{padding:10px}
+.pk{display:flex;justify-content:space-between;align-items:center;width:100%;padding:11px 12px;border-radius:10px;text-align:right;border:1px solid transparent;gap:8px}
+.pk:hover{background:var(--card2)}
+.pk.active{border-color:var(--accent);background:rgba(229,9,20,.1)}
+.pk small{color:var(--muted);white-space:nowrap}
+.pk-detail{padding:16px;min-width:0}
+.pd-head{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.pd-name{flex:1;min-width:170px;font-size:17px;font-weight:700}
+.pd-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px;font-size:13px;color:var(--muted)}
+.pd-bar .inp{max-width:280px}
+.chrow{display:flex;align-items:center;gap:8px;padding:7px 8px;border-radius:10px}
+.chrow:hover{background:var(--bg2)}
+.chrow.off .logo,.chrow.off .chinfo{opacity:.45}
+.logo{width:40px;height:40px;border-radius:9px;background:var(--card2);display:grid;place-items:center;overflow:hidden;flex-shrink:0;font-weight:800;color:var(--muted)}
+.logo img{width:100%;height:100%;object-fit:contain;padding:3px}
+.chinfo{flex:1;min-width:0}
+.chinfo b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.chinfo small{color:var(--muted);font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;background:var(--line)}
+.dot.ok{background:var(--ok)} .dot.fail{background:var(--bad)} .dot.http{background:var(--warn)} .dot.wait{background:var(--muted);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.25}}
+.switch{position:relative;width:38px;height:22px;flex-shrink:0;display:inline-block}
+.switch input{opacity:0;width:0;height:0}
+.switch span{position:absolute;inset:0;background:var(--card2);border:1px solid var(--line);border-radius:99px;transition:.2s;cursor:pointer}
+.switch span::after{content:"";position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:var(--muted);transition:.2s}
+.switch input:checked+span{background:var(--ok);border-color:var(--ok)}
+.switch input:checked+span::after{transform:translateX(-16px);background:#fff}
+
+/* ---------- النوافذ ---------- */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:grid;place-items:center;padding:16px;z-index:50;overflow:auto}
+.mbox{width:100%;max-width:580px;padding:22px;max-height:calc(100vh - 32px);overflow:auto}
+.mbox h3{font-size:19px;margin-bottom:4px}
+.mbox .sub{color:var(--muted);font-size:14px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.checks{display:flex;flex-wrap:wrap;gap:8px}
+.check{display:inline-flex;align-items:center;gap:7px;padding:8px 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg2);cursor:pointer;font-size:14px}
+.check input{accent-color:var(--accent);width:16px;height:16px}
+.check small{color:var(--muted)}
+.mfoot{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.codes-out{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:14px;max-height:280px;overflow:auto;direction:ltr;text-align:left;font-family:ui-monospace,Consolas,monospace;line-height:1.9;font-weight:700;letter-spacing:1px}
+.hint{font-size:12px;color:var(--muted);margin-top:6px;line-height:1.7}
+.ext-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+.mbox video{width:100%;aspect-ratio:16/9;background:#000;border-radius:10px;margin-top:14px;display:block}
+
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);padding:12px 20px;border-radius:12px;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.5);max-width:calc(100% - 32px)}
+.toast.err{border-color:var(--bad)}
+
+@media (max-width:1150px){
+  .crow{grid-template-columns:1.3fr 1fr .6fr .8fr auto}
+  .crow .c-pk,.crow .c-last{display:none}
+}
+@media (max-width:860px){
+  #appView{grid-template-columns:1fr}
+  .side{height:auto;flex-direction:row;align-items:center;overflow-x:auto;padding:8px;z-index:20;border:0;border-bottom:1px solid var(--line)}
+  .side .brand{padding:0 4px}
+  .side .brand span,.nav .cnt,.who{display:none}
+  .nav{width:auto;padding:9px 11px}
+  .side-foot{margin:0;border:0;padding:0;flex-direction:row}
+  .content{padding:14px}
+  .grid2,.pk-layout,.frow{grid-template-columns:1fr}
+  .crow.head{display:none}
+  .crow{grid-template-columns:1fr auto;gap:4px 10px}
+  .crow>div{grid-column:1/-1}
+  .crow>.c-main{grid-column:1}
+  .crow>.c-st{grid-column:2;grid-row:1}
+  .crow .c-pk,.crow .c-last{display:block}
+  .acts{justify-content:flex-start;flex-wrap:wrap}
+  .toolbar .inp{flex:1;min-width:140px}
+  .chrow{flex-wrap:wrap}
+  .chinfo{flex-basis:calc(100% - 70px)}
+}
+.crow.c5{grid-template-columns:1.4fr 1.2fr 1fr .8fr auto}
+@media (max-width:1150px){.crow.c5{grid-template-columns:1.4fr 1fr .8fr auto}}
+@media (max-width:860px){.crow.c5{grid-template-columns:1fr auto}}
+</style>
+</head>
+<body>
+
+<!-- ============ الدخول ============ -->
+<section id="loginView" class="center">
+  <form class="card login" id="loginForm">
+    <div class="brand-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="11" width="18" height="10" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+    <h1 id="loginTitle">لوحة التحكم</h1>
+    <p id="loginSub">أدخل كلمة مرور المدير</p>
+    <label class="f">كلمة المرور</label>
+    <input class="inp ltr" id="password" type="password" autocomplete="current-password" required>
+    <div id="confirmWrap" class="hidden">
+      <label class="f">تأكيد كلمة المرور</label>
+      <input class="inp ltr" id="password2" type="password" autocomplete="new-password">
+      <div class="hint">احفظ كلمة المرور جيدًا، فلا يمكن استرجاعها إذا نسيتها.</div>
+    </div>
+    <button class="btn primary block" id="loginBtn" type="submit">دخول</button>
+    <div class="msg" id="loginMsg"></div>
+  </form>
+</section>
+
+<!-- ============ اللوحة ============ -->
+<div id="appView" class="hidden">
+  <aside class="side">
+    <div class="brand"><div class="brand-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="#fff"><path d="M21 6h-7.6l3.3-3.3-.7-.7L12 6 8 2l-.7.7L10.6 6H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2zm0 14H3V8h18v12zM9 10v8l7-4z"/></svg></div><span id="brandName">تلفازي</span></div>
+    <button class="nav active" data-view="codes"><span data-ico="key"></span>الأكواد<span class="cnt" id="nCodes">0</span></button>
+    <button class="nav" data-view="pkgs"><span data-ico="tv"></span>الباقات والقنوات<span class="cnt" id="nPkgs">0</span></button>
+    <button class="nav" data-view="settings"><span data-ico="gear"></span>الإعدادات</button>
+    <div class="side-foot">
+      <a class="nav" href="./" target="_blank"><span data-ico="ext"></span>فتح الموقع</a>
+      <button class="nav" id="logoutBtn"><span data-ico="out"></span>خروج</button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <div class="pubbar" id="pubbar"></div>
+
+    <section id="v-codes">
+      <div class="stats" id="stats"></div>
+      <div class="toolbar">
+        <h2>أكواد الزوار</h2>
+        <input class="inp" id="codeSearch" type="search" placeholder="بحث بالكود أو الاسم أو الرقم...">
+        <select class="inp" id="codeFilter">
+          <option value="all">كل الحالات</option>
+          <option value="active">فعّالة</option>
+          <option value="expiring">تنتهي قريبًا</option>
+          <option value="expired">منتهية</option>
+          <option value="disabled">موقوفة</option>
+        </select>
+        <button class="btn primary" id="newCodeBtn"><span data-ico="plus"></span>إنشاء أكواد</button>
+      </div>
+      <div class="card table" id="codesList"></div>
+    </section>
+
+    <section id="v-pkgs" class="hidden">
+      <div class="toolbar">
+        <h2>الباقات والقنوات</h2>
+        <button class="btn primary" id="newPkgBtn"><span data-ico="plus"></span>باقة جديدة</button>
+      </div>
+      <div class="pk-layout">
+        <div class="card pk-list" id="pkgList"></div>
+        <div class="card pk-detail" id="pkgDetail"></div>
+      </div>
+    </section>
+
+    <section id="v-settings" class="hidden"></section>
+  </main>
+</div>
+
+<script>
+/* ================= أدوات ================= */
+const $ = id => document.getElementById(id);
+const h = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const DAY = 864e5;
+const normCode = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+const fmtCode = c => c.length > 4 ? c.match(/.{1,4}/g).join('-') : c;
+const ALPH = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+function genCode(len, prefix){
+  const a = new Uint32Array(len); crypto.getRandomValues(a);
+  return normCode(prefix) + [...a].map(x => ALPH[x % ALPH.length]).join('');
+}
+const rid = () => Math.random().toString(36).slice(2, 10);
+const dfmt = new Intl.DateTimeFormat('ar-u-nu-latn', { year:'numeric', month:'short', day:'numeric' });
+const store = {
+  get(k, d=null){ try{ const v = localStorage.getItem(k); return v===null ? d : JSON.parse(v); }catch{ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch{ return false; } },
+  del(k){ try{ localStorage.removeItem(k); }catch{} }
+};
+
+const ICONS = {
+  key:'<circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 9.2-9.2M17 6l3 3M15 8l2 2"/>',
+  tv:'<rect x="2" y="7" width="20" height="14" rx="2"/><path d="m17 2-5 5-5-5"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',
+  ext:'<path d="M14 3h7v7M10 14 21 3M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5"/>',
+  out:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/>',
+  share:'<path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 21l2.1-5.6A8.4 8.4 0 1 1 21 11.5z"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  power:'<path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.8 0"/>',
+  edit:'<path d="M4 20h4L20 8l-4-4L4 16z"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+  play:'<path d="M7 4l13 8-13 8z"/>',
+  up:'<path d="M12 19V5M5 12l7-7 7 7"/>',
+  down:'<path d="M12 5v14M5 12l7 7 7-7"/>',
+  upload:'<path d="M12 15V3M7 8l5-5 5 5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/>',
+  download:'<path d="M12 3v12M7 10l5 5 5-5M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/>',
+  pulse:'<path d="M3 12h4l3-8 4 16 3-8h4"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-3-6.7L21 8"/><path d="M21 3v5h-5"/>'
+};
+const ico = (n, s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ICONS[n]}</svg>`;
+document.querySelectorAll('[data-ico]').forEach(el => el.outerHTML = ico(el.dataset.ico));
+
+function toast(text, err = false){
+  document.querySelectorAll('.toast').forEach(x => x.remove());
+  const t = document.createElement('div'); t.className = 'toast' + (err ? ' err' : ''); t.textContent = text;
+  document.body.appendChild(t); setTimeout(() => t.remove(), err ? 5000 : 2600);
+}
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); }
+  catch{ const a = document.createElement('textarea'); a.value = t; document.body.appendChild(a); a.select(); document.execCommand('copy'); a.remove(); }
+}
+function download(name, text, type = 'text/plain'){
+  const url = URL.createObjectURL(new Blob([text], { type: type + ';charset=utf-8' }));
+  const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+function modal(html){
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div class="card mbox">${html}</div>`;
+  const close = () => { m.dispatchEvent(new Event('closed')); m.remove(); };
+  m.close = close;
+  m.addEventListener('mousedown', e => { if (e.target === m) close(); });
+  m.querySelectorAll('[data-close]').forEach(b => b.onclick = close);
+  document.body.appendChild(m);
+  return m;
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape'){ const all = document.querySelectorAll('.modal'); if (all.length) all[all.length - 1].close(); } });
+
+function logoHTML(c){
+  const initial = h((c.name || '?').trim().charAt(0).toUpperCase()).replace(/'/g, '');
+  if (!c.logo) return initial;
+  return `<img loading="lazy" src="${h(c.logo)}" alt="" onerror="this.replaceWith(document.createTextNode('${initial}'))">`;
+}
+function parseM3U(text){
+  const out = []; let info = null;
+  for (const raw of text.split(/\r?\n/)){
+    const line = raw.trim(); if (!line) continue;
+    if (line.startsWith('#EXTINF')){
+      const attrs = {};
+      line.replace(/([\w-]+)="([^"]*)"/g, (_, k, v) => { attrs[k.toLowerCase()] = v; });
+      const name = line.substring(line.lastIndexOf(',') + 1).trim();
+      info = { name: name || attrs['tvg-name'] || 'قناة', logo: attrs['tvg-logo'] || '', group: (attrs['group-title'] || 'عام').split(';')[0] || 'عام' };
+    } else if (line.startsWith('#EXTGRP:') && info){ info.group = line.slice(8).trim() || info.group; }
+    else if (!line.startsWith('#') && info){ out.push({ ...info, url: line }); info = null; }
+  }
+  return out;
+}
+
+/* ================= التشفير ================= */
+const enc = new TextEncoder(), dec = new TextDecoder();
+function toB64(buf){ const b = new Uint8Array(buf); let s = ''; for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000)); return btoa(s); }
+const fromB64 = s => Uint8Array.from(atob(s), c => c.charCodeAt(0));
+const randBytes = n => crypto.getRandomValues(new Uint8Array(n));
+const hex = b => [...b].map(x => x.toString(16).padStart(2, '0')).join('');
+async function sha256(t){ return hex(new Uint8Array(await crypto.subtle.digest('SHA-256', enc.encode(t)))); }
+async function deriveKey(pass, salt){
+  const base = await crypto.subtle.importKey('raw', enc.encode(pass), 'PBKDF2', false, ['deriveKey']);
+  return crypto.subtle.deriveKey({ name:'PBKDF2', salt, iterations:250000, hash:'SHA-256' }, base, { name:'AES-GCM', length:256 }, false, ['encrypt','decrypt']);
+}
+
+/* ================= الحالة ================= */
+const DRAFT = 'iptv_admin_draft';
+const DURATIONS = [['1','يوم واحد (تجريبي)'],['3','3 أيام'],['7','أسبوع'],['30','شهر'],['90','3 أشهر'],['180','6 أشهر'],['365','سنة'],['none','غير محدود'],['custom','تاريخ محدد...']];
+const DEFAULT_TEMPLATE = 'مرحبًا {name} 👋\nتم تفعيل اشتراكك في {site}\n\n🔑 كود الدخول: {code}\n🌐 رابط المشاهدة: {link}\n📅 الصلاحية: {expiry}\n\nمشاهدة ممتعة!';
+const STATUS = { active:['فعّال','ok'], expiring:['ينتهي قريبًا','warn'], expired:['منتهي','bad'], disabled:['موقوف','off'] };
+const CH_STATUS = { ok:'يعمل', fail:'لا يستجيب', http:'رابط HTTP غير آمن', wait:'جارِ الفحص' };
+const FREE_LISTS = [
+  ['القنوات العربية', 'https://iptv-org.github.io/iptv/languages/ara.m3u'],
+  ['قنوات العراق', 'https://iptv-org.github.io/iptv/countries/iq.m3u'],
+  ['قنوات الأخبار', 'https://iptv-org.github.io/iptv/categories/news.m3u']
+];
+
+let FILE = null;              // data.json كما هو منشور الآن
+let S = null;                 // بيانات اللوحة الكاملة
+let KEY = null, KDF_SALT = ''; // مفتاح التشفير
+let curRev = 0, dirty = false, pendingRev = 0;
+const ui = { view:'codes', filter:'all', search:'', selPkg:null, renderedPkg:null, chSearch:'', chStatus:{}, checking:false };
+
+const emptyState = () => ({ site:{ siteName:'تلفازي', template: DEFAULT_TEMPLATE, defaultDays:'30' }, salt: hex(randBytes(16)), codes:[], packages:[] });
+
+function statusOf(c){
+  if (!c.active) return 'disabled';
+  if (c.expiresAt && c.expiresAt <= Date.now()) return 'expired';
+  if (c.expiresAt && c.expiresAt - Date.now() < 7 * DAY) return 'expiring';
+  return 'active';
+}
+function expText(c){
+  if (!c.expiresAt) return { main:'غير محدود', sub:'' };
+  const d = Math.ceil((c.expiresAt - Date.now()) / DAY);
+  return { main: dfmt.format(c.expiresAt), sub: d > 0 ? `متبقٍ ${d} يوم` : 'منتهي' };
+}
+const pkgName = id => (S.packages.find(p => p.id === id) || {}).name || 'محذوفة';
+const curPkg = () => S.packages.find(p => p.id === ui.selPkg);
+const siteLink = () => S.site.siteUrl || new URL('./', location.href).href;
+
+function saveDraft(){
+  if (!store.set(DRAFT, { rev: curRev, dirty, kdf: KDF_SALT, state: S })) toast('تعذّر الحفظ المؤقت في المتصفح', true);
+}
+function changed(){ dirty = true; saveDraft(); renderPubbar(); refresh(); }
+
+/* ================= الدخول ================= */
+async function fetchFile(){
+  const r = await fetch('data.json?t=' + Date.now(), { cache: 'no-store' });
+  if (!r.ok) throw new Error('HTTP ' + r.status);
+  return r.json();
+}
+(async () => {
+  try{ FILE = await fetchFile(); }
+  catch{
+    $('loginMsg').textContent = 'لم أجد ملف data.json بجانب هذه الصفحة. ارفعه في نفس المجلد على GitHub.';
+    $('loginBtn').disabled = true; return;
+  }
+  if (!FILE.admin){
+    $('loginTitle').textContent = 'إعداد لوحة التحكم';
+    $('loginSub').textContent = 'أول مرة: اختر كلمة مرور للمدير';
+    $('confirmWrap').classList.remove('hidden');
+    $('password').autocomplete = 'new-password';
+    $('loginBtn').textContent = 'إنشاء وبدء الاستخدام';
+  }
+})();
+
+$('loginForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const pass = $('password').value, btn = $('loginBtn'), m = $('loginMsg');
+  m.textContent = ''; btn.disabled = true;
+  try{
+    if (!FILE.admin){
+      if (pass.length < 6) throw new Error('كلمة المرور يجب أن تكون 6 أحرف على الأقل');
+      if (pass !== $('password2').value) throw new Error('كلمتا المرور غير متطابقتين');
+      KDF_SALT = toB64(randBytes(16));
+      KEY = await deriveKey(pass, fromB64(KDF_SALT));
+      S = emptyState(); curRev = FILE.rev || 0; dirty = true;
+      saveDraft();
+    } else {
+      KDF_SALT = FILE.admin.salt;
+      try{
+        KEY = await deriveKey(pass, fromB64(KDF_SALT));
+        const pt = await crypto.subtle.decrypt({ name:'AES-GCM', iv: fromB64(FILE.admin.iv) }, KEY, fromB64(FILE.admin.data));
+        S = JSON.parse(dec.decode(pt));
+      }catch{ throw new Error('كلمة المرور غير صحيحة'); }
+      curRev = FILE.rev || 0; dirty = false; pendingRev = 0;
+      const d = store.get(DRAFT);
+      if (d && d.kdf === KDF_SALT && d.state && d.rev >= curRev){
+        S = d.state; dirty = !!d.dirty;
+        if (d.rev > curRev) pendingRev = d.rev;
+        curRev = d.rev;
+      }
+    }
+    startApp();
+  }catch(err){ m.textContent = err.message; }
+  finally{ btn.disabled = false; }
+});
+
+$('logoutBtn').onclick = () => {
+  if (dirty && !confirm('لديك تغييرات غير منشورة. ستبقى محفوظة في هذا المتصفح. خروج؟')) return;
+  KEY = null; S = null; $('password').value = '';
+  $('appView').classList.add('hidden'); $('loginView').classList.remove('hidden');
+};
+
+function startApp(){
+  $('loginView').classList.add('hidden'); $('appView').classList.remove('hidden');
+  if (!ui.selPkg && S.packages[0]) ui.selPkg = S.packages[0].id;
+  renderPubbar(); go(ui.view);
+  if (!S.packages.length && !S.codes.length) setTimeout(welcomeModal, 300);
+}
+
+function welcomeModal(){
+  modal(`<h3>أهلًا بك 👋</h3>
+    <p class="sub">طريقة العمل بسيطة:</p>
+    <ol class="howto">
+      <li><b>أنشئ باقة</b> وأضف القنوات من قسم «الباقات والقنوات».</li>
+      <li><b>أنشئ أكواد</b> للزوار من قسم «الأكواد».</li>
+      <li>اضغط <b>«نشر التغييرات»</b>، فينزل ملف <b>data.json</b>.</li>
+      <li>ارفعه على GitHub بدل القديم، فتصبح التغييرات فعّالة للزوار خلال دقيقة أو دقيقتين.</li>
+    </ol>
+    <p class="hint">تعديلاتك تُحفظ تلقائيًا في هذا المتصفح حتى تنشرها.</p>
+    <div class="mfoot"><button class="btn primary" data-close>ابدأ</button></div>`);
+}
+
+/* ================= النشر ================= */
+function renderPubbar(){
+  const b = $('pubbar');
+  $('brandName').textContent = S.site.siteName || 'تلفازي';
+  if (dirty){
+    b.className = 'pubbar dirty';
+    b.innerHTML = `<div class="t">⚠️ لديك تغييرات غير منشورة<small>الزوار لن يروها حتى تنشرها وترفع الملف على GitHub</small></div>
+      <button class="btn primary" id="pubBtn">${ico('upload', 16)}نشر التغييرات</button>`;
+    $('pubBtn').onclick = publish;
+  } else if (pendingRev){
+    b.className = 'pubbar pending';
+    b.innerHTML = `<div class="t">⏳ بانتظار رفع ملف data.json على GitHub<small>بعد رفعه قد يستغرق التحديث دقيقة أو دقيقتين</small></div>
+      <button class="btn sm" id="howBtn">طريقة الرفع</button>
+      <button class="btn sm" id="dlAgain">${ico('download', 16)}تنزيل الملف مجددًا</button>
+      <button class="btn sm" id="chkBtn">${ico('refresh', 16)}تحقق</button>`;
+    $('howBtn').onclick = () => uploadHelp();
+    $('dlAgain').onclick = () => publish(true);
+    $('chkBtn').onclick = () => checkPublished(true);
+  } else {
+    b.className = 'pubbar';
+    b.innerHTML = `<div class="t">✅ كل التغييرات منشورة ويراها الزوار</div>`;
+  }
+}
+
+let lastBuilt = null;
+async function buildData(rev){
+  const codes = {};
+  for (const c of S.codes) codes[await sha256(S.salt + c.code)] = { e: c.expiresAt || null, p: c.packages, a: c.active ? 1 : 0 };
+  const packages = {};
+  S.packages.forEach(p => packages[p.id] = {
+    name: p.name,
+    channels: (p.channels || []).filter(c => c.active !== false).map(c => ({ n: c.name, u: c.url, l: c.logo || '', g: c.group || '' }))
+  });
+  const iv = randBytes(12);
+  const ct = await crypto.subtle.encrypt({ name:'AES-GCM', iv }, KEY, enc.encode(JSON.stringify(S)));
+  const s = S.site;
+  return {
+    rev, updated: new Date().toISOString(),
+    site: { siteName: s.siteName || '', announcement: s.announcement || '', whatsapp: s.whatsapp || '', contactText: s.contactText || '' },
+    salt: S.salt, codes, packages,
+    admin: { salt: KDF_SALT, iv: toB64(iv), data: toB64(ct) }
+  };
+}
+
+async function publish(again = false){
+  try{
+    if (again !== true || !lastBuilt){
+      const rev = curRev + 1;
+      lastBuilt = JSON.stringify(await buildData(rev));
+      curRev = rev; dirty = false; pendingRev = rev; saveDraft();
+    }
+    download('data.json', lastBuilt, 'application/json');
+    renderPubbar();
+    uploadHelp();
+  }catch(e){ console.error(e); toast('تعذّر إنشاء الملف: ' + e.message, true); }
+}
+
+function uploadHelp(){
+  const repo = (S.site.repoUrl || '').replace(/\/+$/, '');
+  modal(`<h3>ارفع الملف على GitHub</h3>
+    <p class="sub">تم تنزيل ملف <b>data.json</b> على جهازك (في مجلد التنزيلات).</p>
+    <ol class="howto">
+      <li>افتح مستودع موقعك على GitHub.</li>
+      <li>اضغط <b>Add file</b> ثم <b>Upload files</b>.</li>
+      <li>اسحب ملف <b>data.json</b> إلى الصفحة. سيستبدل القديم تلقائيًا.</li>
+      <li>اضغط <b>Commit changes</b>.</li>
+    </ol>
+    <p class="hint">بعد دقيقة أو دقيقتين تصل التغييرات للزوار. ${repo ? '' : 'لفتح صفحة الرفع مباشرة في المرات القادمة، ضع رابط المستودع في الإعدادات.'}</p>
+    <div class="mfoot">
+      ${repo ? `<a class="btn primary" href="${h(repo)}/upload/main" target="_blank" rel="noopener">${ico('ext', 16)}فتح صفحة الرفع</a>` : ''}
+      <button class="btn" data-close>تم</button>
+    </div>`);
+}
+
+async function checkPublished(manual){
+  if (!pendingRev) return;
+  try{
+    const f = await fetchFile();
+    if ((f.rev || 0) >= pendingRev){
+      FILE = f; pendingRev = 0; saveDraft(); renderPubbar();
+      toast('✅ تم النشر بنجاح. التغييرات يراها الزوار الآن');
+    } else if (manual) toast('لم يصل الملف الجديد بعد. إذا رفعته فانتظر دقيقة وحاول مجددًا.');
+  }catch{ if (manual) toast('تعذّر التحقق', true); }
+}
+setInterval(() => checkPublished(false), 45000);
+window.addEventListener('beforeunload', e => { if (dirty){ e.preventDefault(); e.returnValue = ''; } });
+
+/* ================= التنقل ================= */
+document.querySelectorAll('.nav[data-view]').forEach(b => b.onclick = () => go(b.dataset.view));
+function go(v){
+  ui.view = v;
+  document.querySelectorAll('.nav[data-view]').forEach(b => b.classList.toggle('active', b.dataset.view === v));
+  ['codes','pkgs','settings'].forEach(k => $('v-' + k).classList.toggle('hidden', k !== v));
+  if (v === 'settings') renderSettings(); else refresh();
+}
+function refresh(){
+  if (!S) return;
+  $('nCodes').textContent = S.codes.length;
+  $('nPkgs').textContent = S.packages.length;
+  if (ui.view === 'codes'){ renderStats(); renderCodes(); }
+  else if (ui.view === 'pkgs'){ renderPkgList(); renderPkgDetail(); }
+}
+
+/* ================= الأكواد ================= */
+function renderStats(){
+  const cnt = { active:0, expiring:0, expired:0, disabled:0 };
+  S.codes.forEach(c => cnt[statusOf(c)]++);
+  const chs = S.packages.reduce((a, p) => a + (p.channels || []).length, 0);
+  const stat = (l, n, cls = '') => `<div class="card stat ${cls}"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+  $('stats').innerHTML = stat('إجمالي الأكواد', S.codes.length) + stat('فعّالة', cnt.active + cnt.expiring, 'ok') +
+    stat('تنتهي خلال 7 أيام', cnt.expiring, 'warn') + stat('منتهية', cnt.expired, 'bad') + stat('موقوفة', cnt.disabled) + stat('القنوات', chs);
+}
+
+$('codeSearch').oninput = e => { ui.search = e.target.value.trim().toLowerCase(); renderCodes(); };
+$('codeFilter').onchange = e => { ui.filter = e.target.value; renderCodes(); };
+$('newCodeBtn').onclick = () => codeModal();
+
+function renderCodes(){
+  const q = ui.search;
+  const list = [...S.codes].sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)).filter(c => (ui.filter === 'all' || statusOf(c) === ui.filter) &&
+    (!q || [c.code, fmtCode(c.code), c.customer, c.phone, c.note].some(v => String(v || '').toLowerCase().includes(q))));
+  const box = $('codesList');
+  if (!S.codes.length){ box.innerHTML = `<div class="empty">لا توجد أكواد بعد.<br><br><button class="btn primary" id="emptyNew">${ico('plus')}إنشاء أول كود</button></div>`; $('emptyNew').onclick = () => codeModal(); return; }
+  if (!list.length){ box.innerHTML = '<div class="empty">لا توجد نتائج مطابقة</div>'; return; }
+  const btn = (a, i, t, cls = '') => `<button class="ibtn ${cls}" data-act="${a}" title="${t}">${ico(i, 17)}</button>`;
+  box.innerHTML = `<div class="crow head c5"><div>الكود / العميل</div><div class="c-pk">الباقات</div><div>الصلاحية</div><div>الحالة</div><div></div></div>` +
+    list.slice(0, 500).map(c => {
+      const e = expText(c), [label, cls] = STATUS[statusOf(c)];
+      return `<div class="crow c5" data-id="${c.code}">
+        <div class="c-main"><span class="code">${fmtCode(c.code)}</span><small>${h(c.customer || 'بدون اسم')}${c.phone ? ' · <span dir="ltr">' + h(c.phone) + '</span>' : ''}${c.note ? ' · ' + h(c.note) : ''}</small></div>
+        <div class="c-pk">${(c.packages || []).map(id => `<span class="tag">${h(pkgName(id))}</span>`).join('') || '<small>—</small>'}</div>
+        <div>${e.main}<small>${e.sub}</small></div>
+        <div class="c-st"><span class="badge ${cls}">${label}</span></div>
+        <div class="acts">
+          ${btn('copy','copy','نسخ الكود')}${btn('share','share','رسالة للعميل')}${btn('extend','clock','تمديد')}
+          ${btn('toggle','power', c.active ? 'إيقاف' : 'تفعيل')}${btn('edit','edit','تعديل')}${btn('del','trash','حذف','danger')}
+        </div></div>`;
+    }).join('') + (list.length > 500 ? '<div class="empty">يُعرض أول 500 نتيجة. استخدم البحث.</div>' : '');
+}
+
+$('codesList').addEventListener('click', async e => {
+  const b = e.target.closest('[data-act]'); if (!b) return;
+  const c = S.codes.find(x => x.code === b.closest('[data-id]').dataset.id); if (!c) return;
+  switch (b.dataset.act){
+    case 'copy': await copyText(fmtCode(c.code)); toast('تم نسخ الكود'); break;
+    case 'share': shareModal(c); break;
+    case 'extend': extendModal(c); break;
+    case 'edit': codeModal(c); break;
+    case 'toggle': c.active = !c.active; changed(); toast(c.active ? 'تم تفعيل الكود' : 'تم إيقاف الكود'); break;
+    case 'del':
+      if (confirm(`حذف الكود ${fmtCode(c.code)} نهائيًا؟`)){ S.codes = S.codes.filter(x => x !== c); changed(); toast('تم حذف الكود'); }
+      break;
+  }
+});
+
+function calcExp(dur, date){
+  if (dur === 'none') return null;
+  if (dur === 'custom') return new Date(date + 'T23:59:59').getTime();
+  return Date.now() + Number(dur) * DAY;
+}
+
+function codeModal(c){
+  const edit = !!c, s = S.site;
+  if (!S.packages.length){ toast('أنشئ باقة قنوات أولًا', true); go('pkgs'); return; }
+  const sel = new Set(edit ? (c.packages || []) : S.packages.map(p => p.id));
+  const defDur = String(s.defaultDays || '30');
+  const durOpts = (edit ? [['keep','بدون تغيير']] : []).concat(DURATIONS)
+    .map(([v, l]) => `<option value="${v}" ${!edit && v === defDur ? 'selected' : ''}>${l}</option>`).join('');
+  const m = modal(`
+    <h3>${edit ? 'تعديل الكود <span class="code">' + fmtCode(c.code) + '</span>' : 'إنشاء أكواد جديدة'}</h3>
+    <form id="cf">
+      <div class="frow">
+        <div><label class="f">اسم العميل</label><input class="inp" name="customer" value="${h(edit ? c.customer : '')}"></div>
+        <div><label class="f">رقم واتساب العميل</label><input class="inp ltr" name="phone" value="${h(edit ? c.phone : '')}" placeholder="9647XXXXXXXXX"></div>
+      </div>
+      <label class="f">الباقات المتاحة لهذا الكود</label>
+      <div class="checks">${S.packages.map(p => `<label class="check"><input type="checkbox" name="pk" value="${p.id}" ${sel.has(p.id) ? 'checked' : ''}>${h(p.name)} <small>(${(p.channels || []).length})</small></label>`).join('')}</div>
+      <label class="f">مدة الصلاحية</label>
+      <select class="inp" name="dur">${durOpts}</select>
+      <input class="inp hidden" type="date" name="date" style="margin-top:8px">
+      ${edit ? `<div class="hint">الصلاحية الحالية: ${expText(c).main}</div>
+        <label class="check" style="margin-top:14px"><input type="checkbox" name="active" ${c.active ? 'checked' : ''}>الكود مفعّل</label>` : `
+      <div class="frow">
+        <div><label class="f">عدد الأكواد</label><input class="inp" type="number" name="count" min="1" max="200" value="1"></div>
+        <div><label class="f">طول الكود</label><select class="inp" name="len"><option>6</option><option selected>8</option><option>10</option><option>12</option></select></div>
+      </div>
+      <div class="frow">
+        <div><label class="f">بادئة (اختياري)</label><input class="inp ltr" name="prefix" maxlength="4" placeholder="VIP"></div>
+        <div><label class="f">كود مخصص (اختياري)</label><input class="inp ltr" name="custom" placeholder="لكود واحد فقط"></div>
+      </div>`}
+      <label class="f">ملاحظة</label><input class="inp" name="note" value="${h(edit ? c.note : '')}">
+      <div class="mfoot"><button class="btn primary" type="submit">${edit ? 'حفظ' : 'إنشاء'}</button><button class="btn" type="button" data-close>إلغاء</button></div>
+    </form>`);
+  const f = m.querySelector('#cf');
+  f.elements.dur.onchange = () => f.elements.date.classList.toggle('hidden', f.elements.dur.value !== 'custom');
+  f.onsubmit = e => {
+    e.preventDefault();
+    const fd = new FormData(f), packages = fd.getAll('pk'), dur = fd.get('dur');
+    if (!packages.length) return toast('اختر باقة واحدة على الأقل', true);
+    if (dur === 'custom' && !fd.get('date')) return toast('اختر تاريخ الانتهاء', true);
+    const base = { customer: fd.get('customer').trim(), phone: fd.get('phone').replace(/\D/g, ''), note: fd.get('note').trim(), packages };
+    if (edit){
+      Object.assign(c, base, { active: fd.get('active') === 'on' });
+      if (dur !== 'keep') c.expiresAt = calcExp(dur, fd.get('date'));
+      m.close(); changed(); toast('تم حفظ التعديلات');
+      return;
+    }
+    const exp = calcExp(dur, fd.get('date'));
+    const taken = new Set(S.codes.map(x => x.code));
+    const custom = normCode(fd.get('custom'));
+    let ids = [];
+    if (custom){
+      if (custom.length < 4) return toast('الكود المخصص يجب أن يكون 4 أحرف أو أرقام على الأقل', true);
+      if (taken.has(custom)) return toast('هذا الكود موجود مسبقًا', true);
+      ids = [custom];
+    } else {
+      const count = Math.min(200, Math.max(1, parseInt(fd.get('count')) || 1));
+      while (ids.length < count){ const k = genCode(Number(fd.get('len')), fd.get('prefix')); if (!taken.has(k) && !ids.includes(k)) ids.push(k); }
+    }
+    const now = Date.now();
+    ids.forEach((code, i) => S.codes.push({ code, ...base, active: true, expiresAt: exp, createdAt: now + i }));
+    m.close(); changed(); resultModal(ids, base, exp);
+  };
+}
+
+function resultModal(ids, base, exp){
+  const list = ids.map(fmtCode);
+  const m = modal(`
+    <h3>تم إنشاء ${ids.length === 1 ? 'الكود' : ids.length + ' أكواد'} ✅</h3>
+    <p class="sub">الصلاحية: ${exp ? dfmt.format(exp) : 'غير محدودة'}</p>
+    <div class="codes-out">${list.join('<br>')}</div>
+    <p class="hint">⚠️ لن يعمل الكود عند الزائر حتى تضغط «نشر التغييرات» وترفع الملف.</p>
+    <div class="mfoot">
+      ${ids.length === 1 ? '<button class="btn green" data-x="share">' + ico('share', 16) + 'رسالة للعميل</button>' : ''}
+      <button class="btn primary" data-x="copy">${ico('copy', 16)}نسخ ${ids.length === 1 ? 'الكود' : 'الكل'}</button>
+      <button class="btn" data-x="dl">${ico('download', 16)}تنزيل ملف</button>
+      <button class="btn" data-close>إغلاق</button>
+    </div>`);
+  m.querySelector('[data-x=copy]').onclick = async () => { await copyText(list.join('\n')); toast('تم النسخ'); };
+  m.querySelector('[data-x=dl]').onclick = () => download(`codes-${new Date().toISOString().slice(0,10)}.txt`, list.join('\n'));
+  const sh = m.querySelector('[data-x=share]');
+  if (sh) sh.onclick = () => { m.close(); shareModal(S.codes.find(x => x.code === ids[0])); };
+}
+
+function buildMsg(c){
+  const s = S.site;
+  return (s.template || DEFAULT_TEMPLATE)
+    .replaceAll('{name}', c.customer || '')
+    .replaceAll('{code}', fmtCode(c.code))
+    .replaceAll('{link}', siteLink())
+    .replaceAll('{expiry}', c.expiresAt ? dfmt.format(c.expiresAt) : 'غير محدودة')
+    .replaceAll('{site}', s.siteName || 'تلفازي');
+}
+function shareModal(c){
+  const m = modal(`
+    <h3>رسالة للعميل</h3>
+    <p class="sub">يمكنك تعديل القالب من الإعدادات</p>
+    <textarea class="inp" id="shm" rows="9" style="margin-top:12px">${h(buildMsg(c))}</textarea>
+    <div class="mfoot">
+      <button class="btn green" data-x="wa">${ico('share', 16)}إرسال عبر واتساب</button>
+      <button class="btn primary" data-x="copy">${ico('copy', 16)}نسخ الرسالة</button>
+      <button class="btn" data-close>إغلاق</button>
+    </div>`);
+  m.querySelector('[data-x=copy]').onclick = async () => { await copyText(m.querySelector('#shm').value); toast('تم نسخ الرسالة'); };
+  m.querySelector('[data-x=wa]').onclick = () => window.open(`https://wa.me/${c.phone || ''}?text=${encodeURIComponent(m.querySelector('#shm').value)}`, '_blank', 'noopener');
+}
+
+function extendModal(c){
+  const m = modal(`
+    <h3>تمديد الكود <span class="code">${fmtCode(c.code)}</span></h3>
+    <p class="sub">الصلاحية الحالية: ${expText(c).main} ${expText(c).sub ? '(' + expText(c).sub + ')' : ''}</p>
+    <div class="ext-grid">
+      ${[['1','يوم'],['7','أسبوع'],['30','شهر'],['90','3 أشهر'],['180','6 أشهر'],['365','سنة']].map(([d, l]) => `<button class="btn" data-d="${d}">+ ${l}</button>`).join('')}
+    </div>
+    <div class="mfoot"><button class="btn" data-d="none">جعله غير محدود</button><button class="btn" data-close>إلغاء</button></div>`);
+  m.querySelectorAll('[data-d]').forEach(b => b.onclick = () => {
+    const d = b.dataset.d;
+    c.expiresAt = d === 'none' ? null : Math.max(Date.now(), c.expiresAt || 0) + Number(d) * DAY;
+    c.active = true;
+    m.close(); changed();
+    toast(c.expiresAt ? 'تم التمديد حتى ' + dfmt.format(c.expiresAt) : 'أصبح الكود غير محدود');
+  });
+}
+
+/* ================= الباقات والقنوات ================= */
+$('newPkgBtn').onclick = () => newPkgModal();
+function newPkgModal(){
+  const m = modal(`<h3>باقة جديدة</h3>
+    <form id="pf"><label class="f">اسم الباقة</label><input class="inp" name="name" placeholder="مثال: القنوات العربية" required>
+    <div class="mfoot"><button class="btn primary" type="submit">إنشاء</button><button class="btn" type="button" data-close>إلغاء</button></div></form>`);
+  m.querySelector('input').focus();
+  m.querySelector('#pf').onsubmit = e => {
+    e.preventDefault();
+    const name = e.target.elements.name.value.trim(); if (!name) return;
+    const p = { id: rid(), name, channels: [] };
+    S.packages.push(p); ui.selPkg = p.id; ui.renderedPkg = null;
+    m.close(); go('pkgs'); changed(); toast('تم إنشاء الباقة');
+  };
+}
+
+function renderPkgList(){
+  $('pkgList').innerHTML = S.packages.map(p => `
+    <button class="pk ${p.id === ui.selPkg ? 'active' : ''}" data-pk="${p.id}"><span>${h(p.name)}</span><small>${(p.channels || []).length} قناة</small></button>`).join('')
+    || '<div class="empty">لا توجد باقات</div>';
+}
+$('pkgList').addEventListener('click', e => {
+  const b = e.target.closest('[data-pk]'); if (!b) return;
+  ui.selPkg = b.dataset.pk; renderPkgList(); renderPkgDetail();
+});
+
+function renderPkgDetail(){
+  const p = curPkg(), box = $('pkgDetail');
+  if (!p){
+    ui.renderedPkg = null;
+    box.innerHTML = `<div class="empty">لا توجد باقات بعد. الباقة مجموعة قنوات تمنحها للأكواد.<br><br><button class="btn primary" data-a="newpkg">${ico('plus')}إنشاء أول باقة</button></div>`;
+    return;
+  }
+  if (ui.renderedPkg !== p.id){
+    ui.renderedPkg = p.id; ui.chSearch = '';
+    box.innerHTML = `
+      <div class="pd-head">
+        <input class="inp pd-name" id="pkgName" value="${h(p.name)}" title="اسم الباقة">
+        <button class="btn primary sm" data-a="add">${ico('plus', 16)}قناة</button>
+        <button class="btn sm" data-a="import">${ico('upload', 16)}استيراد M3U</button>
+        <button class="btn sm" data-a="export">${ico('download', 16)}تصدير</button>
+        <button class="btn sm" data-a="check">${ico('pulse', 16)}فحص القنوات</button>
+        <button class="btn sm danger" data-a="delpkg" title="حذف الباقة">${ico('trash', 16)}</button>
+      </div>
+      <div class="pd-bar"><input class="inp" id="chSearch" type="search" placeholder="ابحث في قنوات الباقة..."><span id="chCount"></span><span id="checkInfo"></span></div>
+      <div id="chList"></div>`;
+    $('pkgName').onchange = e => { const v = e.target.value.trim(); if (!v) return; p.name = v; changed(); toast('تم تغيير اسم الباقة'); };
+    $('chSearch').oninput = e => { ui.chSearch = e.target.value.trim().toLowerCase(); renderChannels(); };
+  } else {
+    const n = $('pkgName'); if (n && document.activeElement !== n) n.value = p.name;
+  }
+  renderChannels();
+}
+
+function renderChannels(){
+  const p = curPkg(), list = $('chList'); if (!p || !list) return;
+  const all = p.channels || [], q = ui.chSearch;
+  const on = all.filter(c => c.active !== false).length;
+  $('chCount').textContent = `${all.length} قناة (${on} ظاهرة)`;
+  if (!all.length){ list.innerHTML = '<div class="empty">هذه الباقة فارغة.<br>أضف قناة يدويًا، أو اضغط «استيراد M3U» لإضافة قوائم قنوات مجانية جاهزة.</div>'; return; }
+  const rows = all.map((c, i) => ({ c, i })).filter(({ c }) => !q || (c.name || '').toLowerCase().includes(q) || (c.group || '').toLowerCase().includes(q) || (c.url || '').toLowerCase().includes(q));
+  if (!rows.length){ list.innerHTML = '<div class="empty">لا توجد نتائج</div>'; return; }
+  list.innerHTML = rows.slice(0, 400).map(({ c, i }) => {
+    const st = ui.chStatus[c.url];
+    return `<div class="chrow ${c.active === false ? 'off' : ''}" data-i="${i}">
+      <span class="dot ${st || ''}" title="${CH_STATUS[st] || 'لم يُفحص'}"></span>
+      <div class="logo">${logoHTML(c)}</div>
+      <div class="chinfo"><b>${h(c.name)}</b><small>${h(c.group || '—')} · <span dir="ltr">${h(c.url)}</span></small></div>
+      <label class="switch" title="إظهار للزوار"><input type="checkbox" data-tog="${i}" ${c.active !== false ? 'checked' : ''}><span></span></label>
+      <button class="ibtn" data-a="play" title="تجربة التشغيل">${ico('play', 16)}</button>
+      ${q ? '' : `<button class="ibtn" data-a="up" title="لأعلى">${ico('up', 16)}</button><button class="ibtn" data-a="down" title="لأسفل">${ico('down', 16)}</button>`}
+      <button class="ibtn" data-a="edit" title="تعديل">${ico('edit', 16)}</button>
+      <button class="ibtn danger" data-a="del" title="حذف">${ico('trash', 16)}</button>
+    </div>`;
+  }).join('') + (rows.length > 400 ? '<div class="empty">يُعرض أول 400 قناة. استخدم البحث للوصول للبقية.</div>' : '');
+}
+
+$('pkgDetail').addEventListener('click', e => {
+  const a = e.target.closest('[data-a]'); if (!a) return;
+  const p = curPkg(), act = a.dataset.a;
+  if (act === 'newpkg') return newPkgModal();
+  if (!p) return;
+  const row = a.closest('[data-i]'), i = row ? +row.dataset.i : -1;
+  const chs = p.channels;
+  switch (act){
+    case 'add': return channelModal(p);
+    case 'edit': return channelModal(p, i);
+    case 'import': return importModal(p);
+    case 'export': return exportM3U(p);
+    case 'check': return checkChannels(p);
+    case 'play': return testModal(chs[i]);
+    case 'delpkg': return deletePkg(p);
+    case 'disableBad': {
+      let n = 0;
+      chs.forEach(c => { if (['fail','http'].includes(ui.chStatus[c.url]) && c.active !== false){ c.active = false; n++; } });
+      if (n){ changed(); toast(`تم إخفاء ${n} قناة لا تعمل`); }
+      return;
+    }
+    case 'up': case 'down': {
+      const j = i + (act === 'up' ? -1 : 1);
+      if (j < 0 || j >= chs.length) return;
+      [chs[i], chs[j]] = [chs[j], chs[i]];
+      return changed();
+    }
+    case 'del':
+      if (confirm(`حذف القناة «${chs[i].name}»؟`)){ chs.splice(i, 1); changed(); }
+      return;
+  }
+});
+$('pkgDetail').addEventListener('change', e => {
+  if (!e.target.matches('[data-tog]')) return;
+  const p = curPkg(); p.channels[+e.target.dataset.tog].active = e.target.checked; changed();
+});
+
+function channelModal(p, i = -1){
+  const c = i >= 0 ? p.channels[i] : { name:'', url:'', logo:'', group:'', active:true };
+  const groups = [...new Set((p.channels || []).map(x => x.group).filter(Boolean))];
+  const m = modal(`
+    <h3>${i >= 0 ? 'تعديل القناة' : 'إضافة قناة إلى «' + h(p.name) + '»'}</h3>
+    <form id="chf">
+      <label class="f">اسم القناة</label><input class="inp" name="name" value="${h(c.name)}" required>
+      <label class="f">رابط البث (m3u8)</label><input class="inp ltr" name="url" value="${h(c.url)}" placeholder="https://.../index.m3u8" required>
+      <div class="frow">
+        <div><label class="f">رابط الشعار (اختياري)</label><input class="inp ltr" name="logo" value="${h(c.logo)}" placeholder="https://.../logo.png"></div>
+        <div><label class="f">التصنيف</label><input class="inp" name="group" value="${h(c.group)}" list="grpList" placeholder="أخبار، رياضة..."></div>
+      </div>
+      <datalist id="grpList">${groups.map(g => `<option value="${h(g)}">`).join('')}</datalist>
+      <label class="check" style="margin-top:14px"><input type="checkbox" name="active" ${c.active !== false ? 'checked' : ''}>ظاهرة للزوار</label>
+      <div class="hint">⚠️ روابط http:// لا تعمل على المواقع الآمنة (https) مثل GitHub Pages.</div>
+      <div class="mfoot"><button class="btn primary" type="submit">حفظ</button><button class="btn" type="button" data-x="test">${ico('play', 16)}تجربة</button><button class="btn" type="button" data-close>إلغاء</button></div>
+    </form>`);
+  const f = m.querySelector('#chf');
+  const read = () => ({ id: c.id || rid(), name: f.elements.name.value.trim(), url: f.elements.url.value.trim(), logo: f.elements.logo.value.trim(), group: f.elements.group.value.trim() || 'عام', active: f.elements.active.checked });
+  m.querySelector('[data-x=test]').onclick = () => { const v = read(); if (v.url) testModal(v); };
+  f.onsubmit = e => {
+    e.preventDefault();
+    const v = read();
+    if (!/^https?:\/\//i.test(v.url)) return toast('رابط البث يجب أن يبدأ بـ https://', true);
+    if (i >= 0) p.channels[i] = v; else p.channels.push(v);
+    m.close(); changed(); toast(i >= 0 ? 'تم حفظ القناة' : 'تمت إضافة القناة');
+  };
+}
+
+function importModal(p){
+  const m = modal(`
+    <h3>استيراد قنوات إلى «${h(p.name)}»</h3>
+    <form id="imf">
+      <label class="f">قوائم قنوات مجانية جاهزة</label>
+      <div class="checks">${FREE_LISTS.map(([n, u]) => `<button type="button" class="check" data-u="${u}">${h(n)}</button>`).join('')}</div>
+      <label class="f">رابط ملف M3U</label><input class="inp ltr" name="url" placeholder="https://example.com/list.m3u">
+      <label class="f">أو ارفع ملفًا من جهازك</label><input class="inp" type="file" name="file" accept=".m3u,.m3u8,.txt">
+      <label class="f">أو الصق محتوى الملف</label><textarea class="inp ltr" name="paste" rows="3" placeholder="#EXTM3U ..."></textarea>
+      <div class="frow">
+        <div><label class="f">طريقة الاستيراد</label><select class="inp" name="mode"><option value="append">إضافة إلى القنوات الحالية</option><option value="replace">استبدال كل القنوات</option></select></div>
+        <div><label class="f">تصنيف موحّد (اختياري)</label><input class="inp" name="group" placeholder="يُستخدم تصنيف الملف إن تُرك فارغًا"></div>
+      </div>
+      <label class="check" style="margin-top:14px"><input type="checkbox" name="https" checked>تجاهل روابط http:// (لا تعمل على GitHub Pages)</label>
+      <div class="mfoot"><button class="btn primary" type="submit">${ico('upload', 16)}استيراد</button><button class="btn" type="button" data-close>إلغاء</button></div>
+    </form>`);
+  const f = m.querySelector('#imf');
+  m.querySelectorAll('[data-u]').forEach(b => b.onclick = () => { f.elements.url.value = b.dataset.u; m.querySelectorAll('[data-u]').forEach(x => x.style.borderColor = ''); b.style.borderColor = 'var(--accent)'; });
+  f.onsubmit = async e => {
+    e.preventDefault();
+    const sb = f.querySelector('[type=submit]'); sb.disabled = true;
+    try{
+      const file = f.elements.file.files[0], paste = f.elements.paste.value.trim(), url = f.elements.url.value.trim();
+      let text = '';
+      if (file) text = await file.text();
+      else if (paste) text = paste;
+      else if (url){
+        try{ const r = await fetch(url); if (!r.ok) throw 0; text = await r.text(); }
+        catch{ throw new Error('تعذّر جلب الرابط من المتصفح (غالبًا بسبب حماية CORS). نزّل الملف على جهازك وارفعه بدلًا من ذلك.'); }
+      } else throw new Error('اختر قائمة جاهزة أو أدخل رابطًا أو ارفع ملفًا');
+      let list = parseM3U(text);
+      if (!list.length) throw new Error('لم يتم العثور على قنوات في الملف');
+      let skipped = 0;
+      if (f.elements.https.checked){ const n = list.length; list = list.filter(c => !/^http:/i.test(c.url)); skipped = n - list.length; }
+      const g = f.elements.group.value.trim(); if (g) list.forEach(c => c.group = g);
+      const replace = f.elements.mode.value === 'replace';
+      if (replace && p.channels.length && !confirm(`سيتم حذف ${p.channels.length} قناة حالية واستبدالها. متابعة؟`)){ sb.disabled = false; return; }
+      if (replace) p.channels = [];
+      const seen = new Set(p.channels.map(c => c.url)); let added = 0;
+      list.forEach(c => { if (seen.has(c.url)) return; seen.add(c.url); p.channels.push({ id: rid(), name: c.name, url: c.url, logo: c.logo, group: c.group, active: true }); added++; });
+      m.close(); changed();
+      toast(`تم استيراد ${added} قناة` + (skipped ? ` · تم تجاهل ${skipped} رابط http` : ''));
+    }catch(err){ sb.disabled = false; toast(err.message, true); }
+  };
+}
+
+function exportM3U(p){
+  const q = s => String(s || '').replace(/"/g, "'");
+  const text = '#EXTM3U\n' + (p.channels || []).map(c => `#EXTINF:-1 tvg-logo="${q(c.logo)}" group-title="${q(c.group)}",${c.name}\n${c.url}`).join('\n') + '\n';
+  download(`${p.name}.m3u`, text, 'audio/x-mpegurl');
+}
+
+async function checkChannels(p){
+  if (ui.checking) return toast('الفحص قيد التشغيل...');
+  const list = p.channels || []; if (!list.length) return;
+  ui.checking = true;
+  let done = 0, ok = 0, bad = 0;
+  const info = () => { const el = $('checkInfo'); if (el) el.innerHTML = `فحص ${done}/${list.length} · <span style="color:var(--ok)">${ok} يعمل</span> · <span style="color:var(--bad)">${bad} لا يعمل</span>`; };
+  list.forEach(c => ui.chStatus[c.url] = 'wait'); renderChannels(); info();
+  const queue = [...list];
+  const worker = async () => {
+    while (queue.length){
+      const c = queue.shift(); let st;
+      if (location.protocol === 'https:' && /^http:/i.test(c.url)) st = 'http';
+      else {
+        const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 8000);
+        try{ const r = await fetch(c.url, { signal: ctl.signal }); st = r.ok ? 'ok' : 'fail'; }catch{ st = 'fail'; }
+        clearTimeout(t); ctl.abort();
+      }
+      ui.chStatus[c.url] = st; done++; st === 'ok' ? ok++ : bad++;
+      info(); if (done % 8 === 0) renderChannels();
+    }
+  };
+  await Promise.all(Array.from({ length: 6 }, worker));
+  ui.checking = false; renderChannels(); info();
+  if (bad && $('checkInfo')) $('checkInfo').insertAdjacentHTML('beforeend', ` <button class="btn sm" data-a="disableBad">إخفاء غير العاملة (${bad})</button>`);
+}
+
+function testModal(c){
+  if (!c) return;
+  const m = modal(`<h3>${h(c.name || 'تجربة القناة')}</h3><p class="sub" id="tst">جارِ الاتصال...</p><video controls autoplay playsinline muted></video>
+    <div class="mfoot"><button class="btn" data-close>إغلاق</button></div>`);
+  const v = m.querySelector('video'), st = m.querySelector('#tst');
+  let hls = null;
+  v.addEventListener('playing', () => { st.textContent = '✅ القناة تعمل'; st.style.color = 'var(--ok)'; });
+  const fail = t => { st.textContent = '❌ ' + t; st.style.color = 'var(--bad)'; };
+  if (location.protocol === 'https:' && /^http:/i.test(c.url)) fail('رابط http لا يعمل على موقع https');
+  else if (window.Hls && Hls.isSupported() && !/\.(mp4|webm)(\?|$)/i.test(c.url)){
+    hls = new Hls(); hls.loadSource(c.url); hls.attachMedia(v);
+    hls.on(Hls.Events.MANIFEST_PARSED, () => v.play().catch(() => {}));
+    hls.on(Hls.Events.ERROR, (_, d) => { if (d.fatal) fail('القناة لا تعمل أو تمنع التشغيل من المتصفح'); });
+  } else { v.src = c.url; v.onerror = () => fail('تعذّر تشغيل الرابط'); }
+  m.addEventListener('closed', () => { if (hls) hls.destroy(); v.pause(); v.removeAttribute('src'); });
+}
+
+function deletePkg(p){
+  const users = S.codes.filter(c => (c.packages || []).includes(p.id));
+  if (!confirm(`حذف الباقة «${p.name}» و${p.channels.length} قناة؟` + (users.length ? `\nستُزال من ${users.length} كود.` : ''))) return;
+  S.packages = S.packages.filter(x => x !== p);
+  users.forEach(c => c.packages = c.packages.filter(id => id !== p.id));
+  ui.selPkg = S.packages[0] ? S.packages[0].id : null; ui.renderedPkg = null;
+  changed(); toast('تم حذف الباقة');
+}
+
+/* ================= الإعدادات ================= */
+function renderSettings(){
+  const s = S.site, defDur = String(s.defaultDays || '30');
+  $('v-settings').innerHTML = `
+    <div class="toolbar"><h2>الإعدادات</h2></div>
+    <form id="sf" class="card panel" style="max-width:760px">
+      <h3>الموقع</h3>
+      <div class="frow">
+        <div><label class="f">اسم الموقع</label><input class="inp" name="siteName" value="${h(s.siteName)}" placeholder="تلفازي"></div>
+        <div><label class="f">رابط الموقع (للرسائل)</label><input class="inp ltr" name="siteUrl" value="${h(s.siteUrl)}" placeholder="${h(new URL('./', location.href).href)}"></div>
+      </div>
+      <label class="f">رابط مستودع GitHub (لفتح صفحة الرفع مباشرة)</label>
+      <input class="inp ltr" name="repoUrl" value="${h(s.repoUrl)}" placeholder="https://github.com/username/repo">
+      <label class="f">إعلان يظهر في صفحة الدخول (اختياري)</label>
+      <textarea class="inp" name="announcement" rows="2">${h(s.announcement)}</textarea>
+      <div class="frow">
+        <div><label class="f">رقم واتساب للتواصل</label><input class="inp ltr" name="whatsapp" value="${h(s.whatsapp)}" placeholder="9647XXXXXXXXX"></div>
+        <div><label class="f">نص زر التواصل</label><input class="inp" name="contactText" value="${h(s.contactText)}" placeholder="للحصول على كود تواصل معنا عبر واتساب"></div>
+      </div>
+      <label class="f">المدة الافتراضية للأكواد الجديدة</label>
+      <select class="inp" name="defaultDays">${DURATIONS.filter(d => d[0] !== 'custom').map(([v, l]) => `<option value="${v}" ${v === defDur ? 'selected' : ''}>${l}</option>`).join('')}</select>
+      <label class="f">قالب رسالة العميل</label>
+      <textarea class="inp" name="template" rows="7">${h(s.template || DEFAULT_TEMPLATE)}</textarea>
+      <div class="hint">المتغيرات: {name} اسم العميل · {code} الكود · {link} رابط الموقع · {expiry} تاريخ الانتهاء · {site} اسم الموقع</div>
+      <div class="mfoot"><button class="btn primary" type="submit">حفظ الإعدادات</button></div>
+    </form>
+    <form id="pwf" class="card panel" style="max-width:760px;margin-top:16px">
+      <h3>تغيير كلمة مرور المدير</h3>
+      <div class="frow">
+        <div><label class="f">كلمة المرور الجديدة</label><input class="inp ltr" type="password" name="p1" autocomplete="new-password"></div>
+        <div><label class="f">تأكيدها</label><input class="inp ltr" type="password" name="p2" autocomplete="new-password"></div>
+      </div>
+      <div class="mfoot"><button class="btn" type="submit">تغيير كلمة المرور</button></div>
+    </form>
+    <div class="card panel" style="max-width:760px;margin-top:16px">
+      <h3>نسخة احتياطية</h3>
+      <p class="hint" style="margin-bottom:12px">ملف فيه كل الأكواد وبيانات العملاء والقنوات (غير مشفّر). احتفظ به في مكان آمن ولا ترفعه على GitHub.</p>
+      <button class="btn" id="backupBtn">${ico('download', 16)}تنزيل نسخة احتياطية</button>
+    </div>`;
+  $('sf').onsubmit = e => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    ['siteName','siteUrl','repoUrl','announcement','whatsapp','contactText','template','defaultDays'].forEach(k => S.site[k] = String(fd.get(k) || '').trim());
+    S.site.whatsapp = S.site.whatsapp.replace(/\D/g, '');
+    changed(); toast('تم حفظ الإعدادات');
+  };
+  $('pwf').onsubmit = async e => {
+    e.preventDefault();
+    const p1 = e.target.elements.p1.value, p2 = e.target.elements.p2.value;
+    if (p1.length < 6) return toast('كلمة المرور يجب أن تكون 6 أحرف على الأقل', true);
+    if (p1 !== p2) return toast('كلمتا المرور غير متطابقتين', true);
+    KDF_SALT = toB64(randBytes(16));
+    KEY = await deriveKey(p1, fromB64(KDF_SALT));
+    e.target.reset(); changed();
+    toast('تم التغيير. انشر التغييرات لتفعيل كلمة المرور الجديدة');
+  };
+  $('backupBtn').onclick = () => download(`backup-${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(S, null, 2), 'application/json');
+}
+
+setInterval(() => { if (S && ui.view === 'codes') refresh(); }, 60000);
+</script>
+</body>
+</html>
