@@ -1,8 +1,1 @@
-{
-  "rev": 0,
-  "site": { "siteName": "تلفازي" },
-  "salt": "",
-  "codes": {},
-  "packages": {},
-  "admin": null
-}
+{"rev":1,"updated":"2026-10-20T23:26:38.076Z","site":{"siteName":"تلفازي","announcement":"","whatsapp":"","contactText":""},"salt":"d608883cad399b7d412cd8ee6a3a763f","codes":{"5d28db46701be98ccd1ef4a19b0024a2b53eb534fb1e52224394a7bcab12d22a":{"e":1800314793048,"p":["uyguxq9w"],"a":1}},"packages":{"uyguxq9w":{"name":"TV","channels":[]}},"admin":{"salt":"IO8d4/vLZxo0U7lw5yroPg==","iv":"u3CNiLjgtpEnts9k","data":"fIMHm90pq03NMcChhwg4Ht3LnJqq21CqReFmjeq1XB8xZp9uYobTi2XDedm6SRfY3+MIp7vMtQUJt5Of3xGGUeX5QpmcAusjE2Z2xL83NaO2tdBLCs1Q+ytof+U96aeuiyjgBUf2WG5jukE8U3rv4dnJubKkIyhkaQdT7OZOtFibEEcG5hNQNqpQG3CktyRkJOH1jPG3VvKWGgUeQWZ0vuFPyn2TZGteckJ2fbRU6kG1v5+E+YRjKpPm/SGlRGIQw2vqTgzBMspE1ia5gbUxRjvk/Fmx2Ybb3twPqiRje9OA/BhpCOg3d5aZ9ryuAO8LVtUXxmVaXCdj+MNCIaQJWxdyemkW45KCmepAwHZikhAH89aQvAwDVbmqieyQMK4BaXbYPMQwcVH8N1lQ81J7LbjJa38Wvq8jYIZ0J+CpTSENNoslLv2Ns77YRXZ44aGPVzOMgunMs5GGklZYJswIPhMyyzmydE67Peu2BJHcHSeNrZeW5f1zKwG+9hjwpZixCwmFF0yCcFX3psHji9Da/FkNy6bTn+zwbv/Ui4i+5Vq4UjjwQjmn39O5/HdwwvO/xteC7RTKHr5LjV8woa+JrAOdpsKY6J7IS6NAv7liQZ0pSw3wxzXAQEu61A7+7dSqhvaAkNksQAqZ2wEYq8yEZyVDvAy06lBgi4JidRTTq6RhN0/z6FQ4MN7X1GQzrcjt1jSpPPcC+05acrzmb5bb0Swf"}}
